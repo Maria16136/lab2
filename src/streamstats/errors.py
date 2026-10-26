@@ -7,7 +7,7 @@ class InvalidEventError(StreamStatsError):
 
 
 class InvalidTimestampError(InvalidEventError):
-    "Базовая ошибка приложения"
+    """Ошибка записи времени"""
 
 
 class UnsupportedFormatError(StreamStatsError):

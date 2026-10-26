@@ -1,5 +1,5 @@
-from src.power import power_function
 from src.constants import SAMPLE_CONSTANT
+from src.power import power_function
 
 
 def main() -> None:

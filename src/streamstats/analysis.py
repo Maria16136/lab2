@@ -50,12 +50,8 @@ class Analyzer:
     def get_report(self) -> dict:
         """Возвращает статистику в виде словаря"""
 
-        return {
-            "total_events": self.total_events,
-            "level_counts": dict(self.level_counts),
-            "source_counts": dict(self.source_counts),
-            "top_error_sources": self.get_top_error_sources(),
-            "first_timestamp": (self.first_timestamp.isoformat() if self.first_timestamp is not None else None),
-            "last_timestamp": (self.last_timestamp.isoformat() if self.last_timestamp is not None else None),
-            "skipped_records": self.skipped_records,
-        }
+        return {"total_events": self.total_events, "level_counts": dict(self.level_counts),
+                "source_counts": dict(self.source_counts), "top_error_sources": self.get_top_error_sources(),
+                "first_timestamp": (self.first_timestamp.isoformat() if self.first_timestamp is not None else None),
+                "last_timestamp": (self.last_timestamp.isoformat() if self.last_timestamp is not None else None),
+                "skipped_records": self.skipped_records}

@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def validate_event(data: dict[str, str]) -> None:
+    """Проверяет, является ли сообщение корректным событием"""
 
     if not isinstance(data, dict):
         raise InvalidEventError("Событие должно быть JSON-объектом")
@@ -27,7 +28,7 @@ def validate_event(data: dict[str, str]) -> None:
     try:
         datetime.fromisoformat(data["timestamp"])
     except ValueError as error:
-        raise InvalidTimestampError("Некорректная дата и время") from error
+        raise InvalidTimestampError("Поле timestamp содержит некорректную дату и время") from error
 
     if not isinstance(data["level"], str):
         raise InvalidEventError("Поле level должно быть строкой")
@@ -52,12 +53,7 @@ def parse_jsonl_line(line: str) -> Event:
 
     validate_event(data)
 
-    return Event(
-        timestamp=data["timestamp"],
-        level=data["level"],
-        source=data["source"],
-        message=data["message"],
-    )
+    return Event(timestamp=data["timestamp"], level=data["level"], source=data["source"], message=data["message"])
 
 
 def parse_csv_row(data: dict[str, str]) -> Event:
@@ -65,12 +61,7 @@ def parse_csv_row(data: dict[str, str]) -> Event:
 
     validate_event(data)
 
-    return Event(
-        timestamp=data["timestamp"],
-        level=data["level"],
-        source=data["source"],
-        message=data["message"],
-    )
+    return Event(timestamp=data["timestamp"], level=data["level"], source=data["source"], message=data["message"])
 
 
 def parse_csv_file(file_path: Path, skip_invalid: bool = False) -> Iterator[Event | None]:
@@ -103,4 +94,3 @@ def parse_jsonl_file(file_path: Path, skip_invalid: bool = False) -> Iterator[Ev
 
                 logger.warning("%s: строка %d пропущена: %s", file_path, line_number, error)
                 yield None
-

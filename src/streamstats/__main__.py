@@ -7,8 +7,7 @@ from streamstats.errors import StreamStatsError
 from streamstats.parsers import parse_csv_file, parse_jsonl_file
 from streamstats.report import save_report
 
-logger = (logging
-          .getLogger(__name__))
+logger = (logging.getLogger(__name__))
 
 
 def main() -> int:
