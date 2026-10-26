@@ -1,11 +1,14 @@
-import json
 import csv
+import json
+import logging
+from collections.abc import Iterator
 from datetime import datetime
 from pathlib import Path
-from collections.abc import Iterator
 
-from streamstats.models import Event
 from streamstats.errors import InvalidEventError, InvalidTimestampError
+from streamstats.models import Event
+
+logger = logging.getLogger(__name__)
 
 
 def validate_event(data: dict[str, str]) -> None:
@@ -70,19 +73,34 @@ def parse_csv_row(data: dict[str, str]) -> Event:
     )
 
 
-def parse_csv_file(file_path: Path) -> Iterator[Event]:
+def parse_csv_file(file_path: Path, skip_invalid: bool = False) -> Iterator[Event | None]:
     """Читает CSV-файл и обрабатывает его записи"""
 
-    with file_path.open('r', encoding="utf-8", newline="") as file:
+    with file_path.open("r", encoding="utf-8", newline="") as file:
         reader = csv.DictReader(file)
 
-        for row in reader:
-            yield parse_csv_row(row)
+        for line_number, row in enumerate(reader, start=2):
+            try:
+                yield parse_csv_row(row)
+            except InvalidEventError as error:
+                if not skip_invalid:
+                    raise InvalidEventError(f"{file_path}: строка {line_number}: {error}") from error
+
+                logger.warning("%s: строка %d пропущена: %s", file_path, line_number, error)
+                yield None
 
 
-def parse_jsonl_file(file_path: Path) -> Iterator[Event]:
+def parse_jsonl_file(file_path: Path, skip_invalid: bool = False) -> Iterator[Event | None]:
     """Читает JSONL-файл и обрабатывает его записи"""
+
     with file_path.open("r", encoding="utf-8") as file:
-        for line in file:
-            yield parse_jsonl_line(line)
+        for line_number, line in enumerate(file, start=1):
+            try:
+                yield parse_jsonl_line(line)
+            except InvalidEventError as error:
+                if not skip_invalid:
+                    raise InvalidEventError(f"{file_path}: строка {line_number}: {error}") from error
+
+                logger.warning("%s: строка %d пропущена: %s", file_path, line_number, error)
+                yield None
 
